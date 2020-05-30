@@ -28,41 +28,34 @@ export default class SocketServer extends EventEmitter {
   public async connect() {
     const server = serve(`${this.config.address}:${this.config.port}`);
 
-    console.log(`Running on ${this.config.address}:${this.config.port}`);
-
     for await (const req of server) {
       const { headers, conn } = req;
-      try {
-        const socket = await acceptWebSocket({
-          conn,
-          headers,
-          bufReader: req.r,
-          bufWriter: req.w,
-        });
-        console.log("A user connected!");
-        const clientId = conn.rid;
-        super.addClient(socket, clientId);
+      acceptWebSocket({
+        conn,
+        headers,
+        bufReader: req.r,
+        bufWriter: req.w,
+      })
+        .then(async (socket: WebSocket): Promise<void> => {
+          const clientId = conn.rid;
+          super.addClient(socket, clientId);
 
-        try {
-          for await (const ev of socket) {
-            if (ev instanceof Uint8Array) {
-              await super.checkEvent(ev, clientId);
-            } else if (isWebSocketCloseEvent(ev)) {
-              const { code, reason } = ev;
-              console.log("ws:Close", code, reason);
+          try {
+            for await (const ev of socket) {
+              if (ev instanceof Uint8Array) {
+                await super.checkEvent(ev, clientId);
+              } else if (isWebSocketCloseEvent(ev)) {
+                const { code, reason } = ev;
+                console.log("ws:Close", code, reason);
+              }
             }
-          }
-        } catch (err) {
-          console.error(`failed to receive frame: ${err}`);
-
-          if (!socket.isClosed) {
+          } catch (e) {
             await super.removeClient(clientId);
           }
-        }
-      } catch (err) {
-        console.error(`failed to accept websocket: ${err}`);
-        await req.respond({ status: 400 });
-      }
+        })
+        .catch((err: Error): void => {
+          console.error(`failed to accept websocket: ${err}`);
+        });
     }
   }
 }
