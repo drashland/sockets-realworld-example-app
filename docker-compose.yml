@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  apache:
+    container_name: realworld_apache
+    build:
+      context: .
+      dockerfile: .docker/apache.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    depends_on:
+      - sockets
+    ports:
+      - "8080:80"
+    networks:
+      - sockets-app-network
+
+  sockets:
+    container_name: realworld_sockets
+    build:
+      context: .
+      dockerfile: .docker/sockets.dockerfile
+    volumes:
+      - ./src:/var/www/src
+    working_dir: /var/www/src
+    ports:
+      - "1667:1667"
+      - "3000:3000"
+    command: bash -c "deno run --allow-net --allow-read --unstable app.ts"
+    networks:
+      - sockets-app-network
+
+networks:
+  sockets-app-network:
+    driver: bridge

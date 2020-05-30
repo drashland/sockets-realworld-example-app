@@ -1,0 +1,88 @@
+* {
+  font-family: 'Courier';
+}
+
+#nav {
+  display: flex;
+  align-items: center;
+  height: 10vh;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+#main {
+  width: 100vw;
+  height: 90vh;
+  overflow: hidden;
+}
+
+#main-content {
+  width: 50vw;
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#rooms {
+  width: 20vw;
+  text-align-last: center;
+}
+
+#container {
+  width: 100vw;
+  height: 80vh;
+  border: 1px solid black;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#messages {
+  width: 100vw;
+  height: 80vh;
+}
+
+li {
+  padding: 25px;
+}
+
+.message {
+  padding: 10px;
+  border-bottom: 1px solid black;
+  word-wrap: break-word;
+}
+
+#username, #submitUsername, #toSend {
+  outline: none;
+}
+
+#username {
+  width: 30vw;
+  padding: 5px;
+  font-size: 1.25em;
+}
+
+#submitUsername {
+  width: 10vw;
+  padding: 5px;
+  background-color: #ddd;
+}
+
+#input-container {
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+#toSend {
+  width: 85vw;
+  padding: 25px;
+  font-size: 1.5em;
+}
+
+#submitMessage {
+  padding: 25px;
+  cursor: pointer;
+  background-color: #ddd;
+}
