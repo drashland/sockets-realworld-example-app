@@ -1,6 +1,5 @@
-import { Drash } from "./deps.ts";
+import { Drash, SocketServer } from "./deps.ts";
 import config from "./config.ts";
-import { SocketServer } from "./sockets/mod.ts";
 
 import HomeResource from "./home_resource.ts";
 import ioServer from "./io_server.ts";
@@ -24,8 +23,8 @@ export {
 };
 
 server.run({
-  hostname: "realworld_sockets",
-  port: 1667,
+  hostname: config.hostname,
+  port: config.port,
 });
 
-console.log('Sockets server running on realworld_sockets:1667')
+console.log(`Sockets server running on ${config.hostname}:${config.port}`)

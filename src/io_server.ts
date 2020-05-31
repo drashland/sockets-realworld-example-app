@@ -1,3 +1,5 @@
+import config from "./config.ts";
+
 export default class IO {
   public io: any;
   public ROOMS: any;
@@ -27,6 +29,8 @@ export default class IO {
   }
   
   init(SocketServer: any) {
-    return new SocketServer();
+    return new SocketServer({
+      address: config.hostname
+    });
   }
 }
