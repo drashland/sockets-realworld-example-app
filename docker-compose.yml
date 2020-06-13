@@ -8,8 +8,8 @@ services:
       context: .
       dockerfile: .docker/apache.dockerfile
     volumes:
-      - ./src:/var/www/src
-    working_dir: /var/www/src
+      - ./:/var/www
+    working_dir: /var/www
     depends_on:
       - sockets
     ports:
@@ -23,8 +23,8 @@ services:
       context: .
       dockerfile: .docker/sockets.dockerfile
     volumes:
-      - ./src:/var/www/src
-    working_dir: /var/www/src
+      - ./:/var/www
+    working_dir: /var/www
     ports:
       - "1667:1667"
       - "3000:3000"

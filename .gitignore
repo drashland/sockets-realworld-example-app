@@ -4,4 +4,4 @@
 node_modules/
 
 src/public/js/app.js
-src/config.ts
+config.ts

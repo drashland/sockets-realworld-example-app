@@ -2,8 +2,7 @@ import { socketClient } from '/public/main.js';
 
 const opponentBox = document.getElementById('game-opponent');
 const userBox = document.getElementById('game-user');
-const userJoinButton = document.getElementById('user-join');
-const opponentJoinButton = document.getElementById('opponent-join');
+const joinButton = document.getElementsByClassName('join');
 
 let gameroom = 'gameroom-1';
 let gameActive = false;
@@ -13,24 +12,20 @@ let letterPos = 0;
 
 let opponentProgress = '';
 let playerCount = 0;
-let joined = false;
+let player = null;
 
 const joinGame = ({ target }) => {
-  if (joined) return alert("You have already joined.");
-  const { value: player } = target;
-  console.log('who joined: ', player);
-  if (player !== 'user') {
-  }
+  if (player) return alert("You have already joined.");
+  const { value: space } = target;
+  console.log('join what position: ', space);
   socketClient.send("wordsmith", {
-    action: 'playerJoined',
+    action: 'player_joined',
     playerCount: 1,
     username,
     gameroom,
-    player,
+    space,
   });
-  playerCount += 1;
-  joined = true;
-  target.style.display = "none";
+  player = space;
 }
 
 const sendMessage = () => {
@@ -46,43 +41,48 @@ const sendMessage = () => {
 const revealWord = () => {
   opponentBox.innerHTML = activeWord;
   userBox.innerHTML = activeWord;
-  gameActive = true;
 }
 
 const countdown = () => {
+  gameActive = true;
   revealWord();
 }
 
-socketClient.on(gameroom, (message) => {
-  if (message.action === 'playerJoined') {
-    playerCount += 1;
-    if (message.player === "user") {
-      userJoinButton.style.display = "none";
-    } else {
-      opponentJoinButton.style.display = "none";
-    }
+const endGame = (username) => {
+  gameActive = false;
+  alert(`${username} won!`);
+};
 
-    if (playerCount === 2 && !gameActive) {
+const updateProgress = (message) => {
+  if (message.username !== username) {
+    // update opponent
+  } else {
+    // update user
+  }
+
+}
+
+socketClient.on(gameroom, (message) => {
+  if (message.action === 'player_joined') {
+    playerCount += 1;
+    if (message.space) joinButtons[space].style.display = "none";
+    if (playerCount === 2) {
       countdown();
       return;
     }
   }
-  if (message.username !== username) {
-    opponentProgress = message.input;
-    if (message.completed && gameActive) {
-      gameActive = false;
-      alert(`${message.username} won!`);
-    }
-  } else {
-    if (message.completed && gameActive) {
-      gameActive = false;
-      alert("You've won!");
-    }
+
+  updateProgress(message);
+  if (message.completed && gameActive) {
+    endGame(message.username);
   }
 });
 
-opponentJoinButton.addEventListener('click', joinGame);
-userJoinButton.addEventListener('click', joinGame);
+for (var i = 0; i < joinButtons.length; i++) {
+  return (i) => {
+    joinButtons[i].addEventListener('click', joinGame);
+  }
+}
 
 
 document.addEventListener('keyup', (event) => {

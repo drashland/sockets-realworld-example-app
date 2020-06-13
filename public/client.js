@@ -1,5 +1,5 @@
 export class SocketClient {
-  constructor(options) {
+  constructor(options = {}) {
     this.conn = null;
     this.options = {
       address: options.address || "localhost",
@@ -32,6 +32,7 @@ export class SocketClient {
     encodedMessage.arrayBuffer().then(buffer => {
       const decodedMessage = new TextDecoder().decode(buffer);
       const parsedMessage = JSON.parse(decodedMessage);
+      console.log(parsedMessage);
 
       Object.keys(parsedMessage).forEach((type) => {
         if (this.listening[type]) this.listening[type](parsedMessage[type]);
@@ -55,6 +56,7 @@ export class SocketClient {
   send(type, message) {
     let toSend = null;
     if (type) {
+      console.log('waiting to send... ', { [type]: message });
       const preparedString = JSON.stringify({ [type]: message });
       toSend = new TextEncoder().encode(preparedString);
     } else {

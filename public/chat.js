@@ -30,6 +30,7 @@ socketClient.on('chat', (message) => {
 });
 
 const loadMessages = (messages) => {
+  console.log(messages);
   messagesInRoom.innerHTML = '';
   messages.forEach(message => {
     const messageString = `${message.username}: ${message.text}`;
