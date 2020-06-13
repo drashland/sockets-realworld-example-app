@@ -2,15 +2,36 @@ import { socketClient } from '/public/main.js';
 
 const opponentBox = document.getElementById('game-opponent');
 const userBox = document.getElementById('game-user');
+const userJoinButton = document.getElementById('user-join');
+const opponentJoinButton = document.getElementById('opponent-join');
 
 let gameroom = 'gameroom-1';
-let gameActive = true;
+let gameActive = false;
 let username;
 let activeWord = 'Testing';
 let letterPos = 0;
 
 let opponentProgress = '';
-// let watchers = [];
+let playerCount = 0;
+let joined = false;
+
+const joinGame = ({ target }) => {
+  if (joined) return alert("You have already joined.");
+  const { value: player } = target;
+  console.log('who joined: ', player);
+  if (player !== 'user') {
+  }
+  socketClient.send("wordsmith", {
+    action: 'playerJoined',
+    playerCount: 1,
+    username,
+    gameroom,
+    player,
+  });
+  playerCount += 1;
+  joined = true;
+  target.style.display = "none";
+}
 
 const sendMessage = () => {
   const input = activeWord.slice(0, letterPos);
@@ -25,17 +46,27 @@ const sendMessage = () => {
 const revealWord = () => {
   opponentBox.innerHTML = activeWord;
   userBox.innerHTML = activeWord;
+  gameActive = true;
 }
 
 const countdown = () => {
-  // if (!waiting) { 
-    revealWord();
-  // } else {
-  //   setTimeout(() => countdown(), 500);
-  // }
+  revealWord();
 }
 
 socketClient.on(gameroom, (message) => {
+  if (message.action === 'playerJoined') {
+    playerCount += 1;
+    if (message.player === "user") {
+      userJoinButton.style.display = "none";
+    } else {
+      opponentJoinButton.style.display = "none";
+    }
+
+    if (playerCount === 2 && !gameActive) {
+      countdown();
+      return;
+    }
+  }
   if (message.username !== username) {
     opponentProgress = message.input;
     if (message.completed && gameActive) {
@@ -50,6 +81,10 @@ socketClient.on(gameroom, (message) => {
   }
 });
 
+opponentJoinButton.addEventListener('click', joinGame);
+userJoinButton.addEventListener('click', joinGame);
+
+
 document.addEventListener('keyup', (event) => {
   if (!gameActive) return;
   if (event.key.toLowerCase() === activeWord[letterPos].toLowerCase()) {
@@ -59,7 +94,9 @@ document.addEventListener('keyup', (event) => {
 });
 
 (() => {
-  if (!history.state) location.href = '/';
+  if (!history.state) {
+    localStorage.setItem("returnTo", "/game");
+    return location.href = '/';
+  }
   username = history.state.username;
-  countdown();
 })();

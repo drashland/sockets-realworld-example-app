@@ -25,8 +25,12 @@ export default class IO {
 
     this.io.on('wordsmith', (incomingEvent: any) => {
       const { message } = incomingEvent;
-      if (message.activeWord === message.input) message.completed = true;
-      console.log('outgoing event: ', incomingEvent)
+      console.log(message.activeWord, message.input);
+      if (message.activeWord && message.input && (message.activeWord === message.input)) message.completed = true;
+      if (message.action === 'playerJoined') {
+        message.playerCount += 1;
+      }
+      console.log(incomingEvent);
       this.io.to(message.gameroom, incomingEvent);
     });
     

@@ -19,11 +19,14 @@
         </select></div>
       <div><a href="https://github.com/drashland/sockets" target="_blank">Github</a></div>
     </div>
-    <div class="container game">
-      <div id="game-opponent"></div>
-      <div id="game-user"></div>
+    <div id="game-container">
+      <div id="game-opponent">
+        <button id="opponent-join" value="opponent">Join Game</button>
+      </div>
+      <div id="game-user">
+        <button id="user-join" value="user">Join Game</button>
+      </div>
     </div>
   </body>
-  <script type="module" src="/public/mode.js"></script>
   <script type="module" src="/public/game.js"></script>
 </html>

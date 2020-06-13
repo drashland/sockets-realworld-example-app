@@ -3,13 +3,12 @@ const socketClient = new SocketClient({});
 
 const setUsername = () => {
   const input = document.getElementById("username").value;
-  if (input) {
-    loadPath(input);
-  }
+  if (input) loadPath(input);
 }
 
 const loadPath = (username) => {
-  history.pushState({ username }, '', '/game');
+  const returnTo = localStorage.getItem("returnTo");
+  history.pushState({ username }, '', returnTo);
   location.reload();
 }
 

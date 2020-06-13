@@ -58,7 +58,10 @@ select.addEventListener('change', (e) => {
 });
 
 (() => {
-  if (!history.state) return location.href = '/';
+  if (!history.state) {
+    localStorage.setItem("returnTo", "/chat");
+    return location.href = '/';
+  }
   username = history.state.username;
   getCurrentRoom(currentRoom);
 })();
