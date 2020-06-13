@@ -4,6 +4,7 @@ import config from "./config.ts";
 import HomeResource from "./home_resource.ts";
 import ioServer from "./io_server.ts";
 import ChatResource from "./chat_resource.ts";
+import GameResource from "./game_resource.ts";
 
 let server = new Drash.Http.Server({
   response_output: "text/html",
@@ -12,7 +13,7 @@ let server = new Drash.Http.Server({
   },
   directory: config.directory,
   static_paths: config.staticPaths,
-  resources: [HomeResource, ChatResource]
+  resources: [HomeResource, ChatResource, GameResource]
 });
 
 

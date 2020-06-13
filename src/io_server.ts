@@ -22,6 +22,13 @@ export default class IO {
       this.ROOMS[message.room].push({ ...message });
       this.io.to('chat', incomingEvent);
     });
+
+    this.io.on('wordsmith', (incomingEvent: any) => {
+      const { message } = incomingEvent;
+      if (message.activeWord === message.input) message.completed = true;
+      console.log('outgoing event: ', incomingEvent)
+      this.io.to(message.gameroom, incomingEvent);
+    });
     
     this.io.on('disconnect', () => {
       console.log('A user disconnected.');

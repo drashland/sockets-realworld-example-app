@@ -1,11 +1,21 @@
+import { SocketClient } from '/public/client.js';
+const socketClient = new SocketClient({});
+
 const setUsername = () => {
   const input = document.getElementById("username").value;
-  if (input) loadChatRoom(input);
+  if (input) {
+    loadPath(input);
+  }
 }
 
-const loadChatRoom = (username) => {
-  history.pushState({ username }, '', '/chat');
+const loadPath = (username) => {
+  history.pushState({ username }, '', '/game');
   location.reload();
 }
 
-document.getElementById('submitUsername').addEventListener('click', setUsername);
+const usernameInput = document.getElementById('submitUsername');
+if (usernameInput) {
+  usernameInput.addEventListener('click', setUsername);
+}
+
+export { socketClient };

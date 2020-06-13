@@ -1,5 +1,4 @@
-import { SocketClient } from '/public/client.js';
-const socket = new SocketClient({});
+import { socketClient } from '/public/main.js';
 
 const messagesInRoom = document.getElementById('messages');
 const select = document.querySelector('#rooms');
@@ -20,12 +19,12 @@ const sendMessage = () => {
   const message = messageBox.value;
   const messageString = `${username}: ${message}`;
 
-  socket.send('chat', { room: currentRoom, username: username, text: message });
+  socketClient.send('chat', { room: currentRoom, username: username, text: message });
   messageBox.value = '';
   addMessageToChat(messageString);
 }
 
-socket.on('chat', (message) => {
+socketClient.on('chat', (message) => {
   const messageString = `${message.username}: ${message.text}`;
   if (currentRoom === message.room) addMessageToChat(messageString);
 });
