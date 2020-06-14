@@ -35,22 +35,32 @@ console.log(
   `Socket server started on ${config.socketServer.hostname}:${config.socketServer.port}`,
 );
 
-socketServer.on("connection", (clientId: any) => {
-  console.log(clientId);
+socketServer.on("connection", () => {
   console.log("A user connected.");
-  console.log(socketServer)
 });
 
-socketServer.on("disconnect", (clientId: any) => {
-  console.log(clientId);
+socketServer.on("disconnect", () => {
   console.log("A user disconnected.");
 });
 
 socketServer.on('chat', (incomingMessage: any) => {
   const { message } = incomingMessage;
+  if (!messages[message.room]) {
+    messages[message.room] = {
+      messages: []
+    };
+  }
   messages[message.room].messages.push({ ...message });
-  console.log(incomingMessage);
+  console.log('ON CHAT: ', incomingMessage);
   socketServer.to('chat', incomingMessage);
+});
+
+socketServer.on('wordsmith', (incomingMessage: any) => {
+  const { message } = incomingMessage;
+  if (message.activeWord && message.input && (message.activeWord === message.input)) message.completed = true;
+  console.log('ON BROADCAST: ', message.gameroom, incomingMessage);
+  console.log(socketServer)
+  socketServer.broadcast(message.gameroom, incomingMessage);
 });
 
 export {

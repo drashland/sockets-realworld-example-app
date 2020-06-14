@@ -2,7 +2,7 @@ import { socketClient } from '/public/main.js';
 
 const opponentBox = document.getElementById('game-opponent');
 const userBox = document.getElementById('game-user');
-const joinButton = document.getElementsByClassName('join');
+const joinButtons = document.getElementsByClassName('join');
 
 let gameroom = 'gameroom-1';
 let gameActive = false;
@@ -20,7 +20,6 @@ const joinGame = ({ target }) => {
   console.log('join what position: ', space);
   socketClient.send("wordsmith", {
     action: 'player_joined',
-    playerCount: 1,
     username,
     gameroom,
     space,
@@ -63,6 +62,7 @@ const updateProgress = (message) => {
 }
 
 socketClient.on(gameroom, (message) => {
+  console.log(gameroom);
   if (message.action === 'player_joined') {
     playerCount += 1;
     if (message.space) joinButtons[space].style.display = "none";
@@ -79,11 +79,8 @@ socketClient.on(gameroom, (message) => {
 });
 
 for (var i = 0; i < joinButtons.length; i++) {
-  return (i) => {
-    joinButtons[i].addEventListener('click', joinGame);
-  }
+  joinButtons[i].addEventListener('click', joinGame);
 }
-
 
 document.addEventListener('keyup', (event) => {
   if (!gameActive) return;

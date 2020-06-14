@@ -1,8 +1,14 @@
+/**
+ * @description
+ *    This SocketClient uses native WebSocket.
+ *    It starts a connection and handles messages with the socket server.
+ */
+
 export class SocketClient {
-  constructor(options = {}) {
+  constructor(options) {
     this.conn = null;
     this.options = {
-      address: options.address || "localhost",
+      hostname: options.hostname || "localhost",
       port: options.port || "3000",
     };
     this.listening = {};
@@ -17,9 +23,9 @@ export class SocketClient {
   }
 
   init(options) {
-    const { address, port } = options;
-    this.conn = new WebSocket(`ws://${address}:${port}`);
-    this.conn.addEventListener('message', (event) => {
+    const { hostname, port } = options;
+    this.conn = new WebSocket(`ws://${hostname}:${port}`);
+    this.conn.addEventListener("message", (event) => {
       this.receiveEncodedMessage(event.data);
     });
   }
@@ -29,35 +35,35 @@ export class SocketClient {
   }
 
   receiveEncodedMessage(encodedMessage) {
-    encodedMessage.arrayBuffer().then(buffer => {
+    encodedMessage.arrayBuffer().then((buffer) => {
       const decodedMessage = new TextDecoder().decode(buffer);
       const parsedMessage = JSON.parse(decodedMessage);
-      console.log(parsedMessage);
-
-      Object.keys(parsedMessage).forEach((type) => {
-        if (this.listening[type]) this.listening[type](parsedMessage[type]);
-      })
+      console.log(decodedMessage)
+      Object.keys(parsedMessage).forEach((eventName) => {
+        if (this.listening[eventName]) {
+          this.listening[eventName](parsedMessage[eventName]);
+        }
+      });
     });
   }
 
-  on(type, cb) {
+  on(eventName, cb) {
     if (this.checkReadyState()) {
-      if (!this.listening[type]) this.listening[type] = null;
-      this.listening[type] = cb;
-      const toSend = JSON.stringify({ listeningTo: type });
+      if (!this.listening[eventName]) this.listening[eventName] = null;
+      this.listening[eventName] = cb;
+      const toSend = JSON.stringify({ listening_to: eventName });
       const encoded = new TextEncoder().encode(toSend);
       this.messageQueue.push(encoded);
       this.emit();
     } else {
-      setTimeout(() => this.on(type,cb), 5);
+      setTimeout(() => this.on(eventName, cb), 5);
     }
   }
 
-  send(type, message) {
+  send(eventName, message) {
     let toSend = null;
-    if (type) {
-      console.log('waiting to send... ', { [type]: message });
-      const preparedString = JSON.stringify({ [type]: message });
+    if (eventName) {
+      const preparedString = JSON.stringify({ [eventName]: message });
       toSend = new TextEncoder().encode(preparedString);
     } else {
       toSend = message;
@@ -71,7 +77,7 @@ export class SocketClient {
       this.ready = false;
       let toSend = null;
       while (this.messageQueue.length) {
-        toSend = new Uint8Array(this.messageQueue[0].length)
+        toSend = new Uint8Array(this.messageQueue[0].length);
         toSend.set(this.messageQueue.pop());
       }
       this.conn.send(toSend);
