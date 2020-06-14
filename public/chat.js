@@ -30,7 +30,6 @@ socketClient.on('chat', (message) => {
 });
 
 const loadMessages = (messages) => {
-  console.log(messages);
   messagesInRoom.innerHTML = '';
   messages.forEach(message => {
     const messageString = `${message.username}: ${message.text}`;
@@ -59,10 +58,10 @@ select.addEventListener('change', (e) => {
 });
 
 (() => {
-  if (!history.state) {
+  username = localStorage.getItem("username");
+  if (!username) {
     localStorage.setItem("returnTo", "/chat");
-    return location.href = '/';
+    location.href = '/';
   }
-  username = history.state.username;
   getCurrentRoom(currentRoom);
 })();

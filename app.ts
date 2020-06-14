@@ -80,16 +80,17 @@ const getActiveWord = () => {
 }
 
 socketServer.on('wordsmith', (incomingMessage: any) => {
-  console.log('ON BROADCAST: ', incomingMessage);
   const { message } = incomingMessage;
   if (!messages[message.gameroom]) {
     messages[message.gameroom] = { status: {} };
     messages[message.gameroom].status.players = [null, null];
   }
-  if (message.activeWord && message.input && (message.activeWord === message.input)) message.completed = true;
+  if (message.activeWord && message.input && (message.activeWord === message.input)) {
+    message.completed = true;
+    messages[message.gameroom].status.players = [null, null];
+  }
   if (message.action === 'player_joined') {
     messages[message.gameroom].status.players[message.space - 1] = incomingMessage.from;
-    console.log(!messages[message.gameroom].status.players.includes(null));
     if (!messages[message.gameroom].status.players.includes(null)) {
       const activeWord = getActiveWord();
       message.activeWord = activeWord;
@@ -97,7 +98,6 @@ socketServer.on('wordsmith', (incomingMessage: any) => {
     }
   }
   message.status = messages[message.gameroom].status;
-  console.log('message...', message);
   socketServer.broadcast(message.gameroom, incomingMessage);
 });
 
