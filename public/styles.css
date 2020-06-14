@@ -2,6 +2,10 @@
   font-family: 'Courier';
 }
 
+button {
+  border: none;
+}
+
 #nav {
   display: flex;
   align-items: center;
@@ -44,7 +48,9 @@
   flex-direction: column;
 }
 
-#game-opponent, #game-user {
+.game-area {
+  overflow-x: hidden;
+  width: 100vw;
   height: 50vh;
   width: 100vw;
   display: flex;
@@ -53,6 +59,9 @@
   font-size: 3em;
   font-weight: 800;
   border-bottom: 10px solid black;
+  font-family: Helvetica;
+  font-weight: 800;
+  letter-spacing: 5px;
 }
 
 #messages {

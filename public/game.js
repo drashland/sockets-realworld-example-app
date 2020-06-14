@@ -1,17 +1,14 @@
 import { socketClient } from '/public/main.js';
 
-const opponentBox = document.getElementById('game-opponent');
-const userBox = document.getElementById('game-user');
+const gameWord = document.getElementsByClassName('game-word');
 const joinButtons = document.getElementsByClassName('join');
 
 let gameroom = 'gameroom-1';
 let gameActive = false;
 let username;
-let activeWord = 'Testing';
+let activeWord = null;
 let letterPos = 0;
 
-let opponentProgress = '';
-let playerCount = 0;
 let player = null;
 
 const joinGame = ({ target }) => {
@@ -29,16 +26,28 @@ const joinGame = ({ target }) => {
 const sendMessage = () => {
   const input = activeWord.slice(0, letterPos);
   socketClient.send("wordsmith", {
+    action: 'input',
     gameroom,
     username,
     activeWord,
     input,
+    space: player,
+    letterPos,
   });
 }
 
 const revealWord = () => {
-  opponentBox.innerHTML = activeWord;
-  userBox.innerHTML = activeWord;
+  const wordElements = activeWord.split('').map(l => {
+    const letter = document.createElement('span');
+    letter.innerHTML = l;
+    return letter;
+  });
+  let index = 0;
+  while (index < gameWord.length) {
+    console.log(gameWord[index]);
+    gameWord[index].append(...wordElements);
+    index += 1;
+  }
 }
 
 const countdown = () => {
@@ -46,17 +55,27 @@ const countdown = () => {
   revealWord();
 }
 
+const resetGame = () => {
+  for (let i = 0; i < gameWord.length; i++) {
+    console.log(gameWord[i].firstChild)
+    while (gameWord[i].firstChild) {
+      gameWord[i].removeChild(gameWord[i].firstChild);
+    }
+  }
+  for (let i = 0; i < joinButtons.length; i++) {
+    joinButtons[i].style.display = 'inline';
+  }
+  player = null;
+}
+
 const endGame = (username) => {
   gameActive = false;
+  resetGame();
   alert(`${username} won!`);
 };
 
 const updateProgress = (message) => {
-  if (message.username !== username) {
-    // update opponent
-  } else {
-    // update user
-  }
+  gameWord[message.space - 1].children[message.letterPos - 1].style.color = 'green';
 }
 
 const getGameStatus = () => {
@@ -67,25 +86,38 @@ const getGameStatus = () => {
 }
 
 socketClient.on(gameroom, (message) => {
+  const players = message.status ? message.status.players : [];
+  console.log(' on game room: ', message);
+
+  if (message.action === 'player_left') {
+    if (message.space !== -1) {
+      joinButtons[message.space - 1].style.display = "inline";
+    }
+  }
+
   if (message.action === 'status') {
-    const players = message.status.players || [];
-    for (var i = 0; i < players.length; i++) {
+    for (let i = 0; i < players.length; i++) {
       if (players[i]) joinButtons[i].style.display = "none";
     }
     return;
   }
   if (message.action === 'player_joined') {
-    playerCount += 1;
     if (message.space) joinButtons[message.space - 1].style.display = "none";
-    if (playerCount === 2) countdown();
-    return;
+  }
+  if (message.action === 'active_word') {
+    if (message.space) joinButtons[message.space - 1].style.display = "none";
+    activeWord = message.activeWord;
+    countdown();
   }
 
-  updateProgress(message);
-  if (message.completed && gameActive) endGame(message.username);
+  if (message.action === 'input') updateProgress(message);
+  if (message.completed && gameActive) {
+    updateProgress(message);
+    endGame(message.username);
+  }
 });
 
-for (var i = 0; i < joinButtons.length; i++) {
+for (let i = 0; i < joinButtons.length; i++) {
   joinButtons[i].addEventListener('click', joinGame);
 }
 

@@ -38,7 +38,7 @@ export class SocketClient {
     encodedMessage.arrayBuffer().then((buffer) => {
       const decodedMessage = new TextDecoder().decode(buffer);
       const parsedMessage = JSON.parse(decodedMessage);
-      console.log(decodedMessage)
+
       Object.keys(parsedMessage).forEach((eventName) => {
         if (this.listening[eventName]) {
           this.listening[eventName](parsedMessage[eventName]);
