@@ -61,15 +61,19 @@ export class SocketClient {
   }
 
   send(eventName, message) {
-    let toSend = null;
-    if (eventName) {
-      const preparedString = JSON.stringify({ [eventName]: message });
-      toSend = new TextEncoder().encode(preparedString);
+    if (this.checkReadyState()) {
+      let toSend = null;
+      if (eventName) {
+        const preparedString = JSON.stringify({ [eventName]: message });
+        toSend = new TextEncoder().encode(preparedString);
+      } else {
+        toSend = message;
+      }
+      this.messageQueue.push(toSend);
+      this.emit();
     } else {
-      toSend = message;
+      setTimeout(() => this.send(eventName, message), 10);
     }
-    this.messageQueue.push(toSend);
-    this.emit();
   }
 
   emit() {

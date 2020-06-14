@@ -51,17 +51,26 @@ socketServer.on('chat', (incomingMessage: any) => {
     };
   }
   messages[message.room].messages.push({ ...message });
-  console.log('ON CHAT: ', incomingMessage);
   socketServer.to('chat', incomingMessage);
 });
 
 socketServer.on('wordsmith', (incomingMessage: any) => {
   const { message } = incomingMessage;
+  if (!messages[message.gameroom]) {
+    messages[message.gameroom] = { status: {} };
+  }
   if (message.activeWord && message.input && (message.activeWord === message.input)) message.completed = true;
-  console.log('ON BROADCAST: ', message.gameroom, incomingMessage);
-  console.log(socketServer)
+  if (message.action === 'player_joined') {
+    messages[message.gameroom].status.players = [null, null];
+    messages[message.gameroom].status.players[message.space - 1] = true;
+  }
+
+  if (message.action === 'status') {
+    message.status = messages[message.gameroom].status;
+  }
   socketServer.broadcast(message.gameroom, incomingMessage);
 });
+
 
 export {
   socketServer,

@@ -17,7 +17,6 @@ let player = null;
 const joinGame = ({ target }) => {
   if (player) return alert("You have already joined.");
   const { value: space } = target;
-  console.log('join what position: ', space);
   socketClient.send("wordsmith", {
     action: 'player_joined',
     username,
@@ -58,24 +57,32 @@ const updateProgress = (message) => {
   } else {
     // update user
   }
+}
 
+const getGameStatus = () => {
+  socketClient.send("wordsmith", {
+    action: 'status',
+    gameroom,
+  });
 }
 
 socketClient.on(gameroom, (message) => {
-  console.log(gameroom);
+  if (message.action === 'status') {
+    const players = message.status.players || [];
+    for (var i = 0; i < players.length; i++) {
+      if (players[i]) joinButtons[i].style.display = "none";
+    }
+    return;
+  }
   if (message.action === 'player_joined') {
     playerCount += 1;
-    if (message.space) joinButtons[space].style.display = "none";
-    if (playerCount === 2) {
-      countdown();
-      return;
-    }
+    if (message.space) joinButtons[message.space - 1].style.display = "none";
+    if (playerCount === 2) countdown();
+    return;
   }
 
   updateProgress(message);
-  if (message.completed && gameActive) {
-    endGame(message.username);
-  }
+  if (message.completed && gameActive) endGame(message.username);
 });
 
 for (var i = 0; i < joinButtons.length; i++) {
@@ -96,4 +103,5 @@ document.addEventListener('keyup', (event) => {
     return location.href = '/';
   }
   username = history.state.username;
+  getGameStatus();
 })();
