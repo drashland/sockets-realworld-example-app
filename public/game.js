@@ -21,8 +21,10 @@ const playerJoinedTrigger = (message) => {
 }
 
 const playerInputTrigger = (message) => {
-  updateProgress(message);
-  if (message.completed && gameActive) endAndResetGame(message.username);
+  if (gameActive) {
+    updateProgress(message);
+    if (message.completed) endAndResetGame(message.username);
+  }
 }
 
 const statusTrigger = (message) => {
