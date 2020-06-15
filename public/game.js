@@ -3,12 +3,11 @@ import { socketClient } from '/public/main.js';
 const gameWordContainer = document.getElementsByClassName('game-word');
 const joinButtons = document.getElementsByClassName('join');
 
+let username;
 let gameroom = 'gameroom-1';
 let gameActive = false;
-let username;
 let activeWord = null;
 let letterPos = 0;
-
 let player = null;
 
 const playerLeftTrigger = (message) => {
@@ -23,7 +22,7 @@ const playerJoinedTrigger = (message) => {
 
 const playerInputTrigger = (message) => {
   updateProgress(message);
-  if (message.completed && gameActive) endGame(message.username);
+  if (message.completed && gameActive) endAndResetGame(message.username);
 }
 
 const statusTrigger = (message) => {
@@ -91,7 +90,7 @@ const countdown = () => {
   revealWord();
 }
 
-const resetGame = () => {
+const endAndResetGame = (username) => {
   for (let i = 0; i < gameWordContainer.length; i++) {
     gameWordContainer[i].innerHTML = '';
   }
@@ -99,11 +98,9 @@ const resetGame = () => {
     joinButtons[i].style.display = 'inline';
   }
   player = null;
-}
-
-const endGame = (username) => {
+  activeWord = null;
+  letterPos = 0;
   gameActive = false;
-  resetGame();
   alert(`${username} won!`);
 };
 
