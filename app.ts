@@ -65,26 +65,18 @@ socketServer.on('chat', (incomingMessage: any) => {
   socketServer.to('chat', incomingMessage);
 });
 
+const wordsApiHeaders = new Headers(config.wordsapi.secrets);
 // todo: dictionary api
-const getActiveWord = () => {
-  const wordBank = [
-    'testing',
-    'elephant',
-    'earthquake',
-    'weather',
-    'linen',
-    'chaise',
-    'architecture',
-    'jump',
-    'tabletop',
-    'accuracy',
-    'hippopotamus',
-  ]
-  return wordBank[Math.floor(Math.random() * wordBank.length)];
+const getActiveWord = async () => {
+  const { word } = await fetch(config.wordsapi.url, {
+    method: "GET",
+    headers: wordsApiHeaders
+  }).then(response => response.json());
+  return word;
   // todo: scramble casing on word
 }
 
-socketServer.on('wordsmith', (incomingMessage: any) => {
+socketServer.on('wordsmith', async (incomingMessage: any) => {
   const { message } = incomingMessage;
   if (!messages[message.gameroom]) {
     messages[message.gameroom] = { status: {} };
@@ -97,7 +89,7 @@ socketServer.on('wordsmith', (incomingMessage: any) => {
   if (message.action === 'player_joined') {
     messages[message.gameroom].status.players[message.space - 1] = incomingMessage.from;
     if (!messages[message.gameroom].status.players.includes(null)) {
-      const activeWord = getActiveWord();
+      const activeWord = await getActiveWord();
       message.activeWord = activeWord;
       message.action = 'active_word';
     }
