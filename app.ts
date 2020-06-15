@@ -65,6 +65,7 @@ socketServer.on('chat', (incomingMessage: any) => {
   socketServer.to('chat', incomingMessage);
 });
 
+// todo: dictionary api
 const getActiveWord = () => {
   const wordBank = [
     'testing',
@@ -73,7 +74,11 @@ const getActiveWord = () => {
     'weather',
     'linen',
     'chaise',
-    'architecture'
+    'architecture',
+    'jump',
+    'tabletop',
+    'accuracy',
+    'hippopotamus',
   ]
   return wordBank[Math.floor(Math.random() * wordBank.length)];
   // todo: scramble casing on word

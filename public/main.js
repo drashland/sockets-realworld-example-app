@@ -9,7 +9,7 @@ const setUsername = () => {
 const loadPath = (username) => {
   const returnTo = localStorage.getItem("returnTo");
   localStorage.setItem("username", username);
-  history.pushState({ username }, '', returnTo);
+  history.pushState({ username }, '', returnTo || '/chat');
   location.reload();
 }
 
