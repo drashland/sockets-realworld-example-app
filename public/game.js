@@ -53,7 +53,7 @@ const reactions = {
 const joinGame = ({ target }) => {
   if (player) return alert("You have already joined.");
   const { value: space } = target;
-  socketClient.send("wordsmith", {
+  socketClient.to("wordsmith", {
     action: 'player_joined',
     username,
     gameroom,
@@ -64,7 +64,7 @@ const joinGame = ({ target }) => {
 
 const sendMessage = () => {
   const input = activeWord.slice(0, letterPos);
-  socketClient.send("wordsmith", {
+  socketClient.to("wordsmith", {
     action: 'input',
     gameroom,
     username,
@@ -111,7 +111,7 @@ const updateProgress = (message) => {
 }
 
 const getGameStatus = () => {
-  socketClient.send("wordsmith", {
+  socketClient.to("wordsmith", {
     action: 'status',
     gameroom,
   });

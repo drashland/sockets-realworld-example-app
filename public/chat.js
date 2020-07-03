@@ -19,7 +19,7 @@ const sendMessage = () => {
   const message = messageBox.value;
   const messageString = `${username}: ${message}`;
 
-  socketClient.send('chat', { room: currentRoom, username: username, text: message });
+  socketClient.to('chat', { room: currentRoom, username: username, text: message });
   messageBox.value = '';
   addMessageToChat(messageString);
 }

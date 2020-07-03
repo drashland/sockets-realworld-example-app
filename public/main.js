@@ -1,4 +1,4 @@
-import { SocketClient } from '/public/client.js';
+import SocketClient from 'https://cdn.jsdelivr.net/gh/drashland/sockets-client@latest/client.js';
 const socketClient = new SocketClient({});
 
 const setUsername = () => {
